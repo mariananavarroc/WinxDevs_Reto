@@ -201,6 +201,86 @@ function ChatHead() {
   );
 }
 
+function ClientIdButton() {
+  const [open, setOpen] = useState(false);
+  const [clientId, setClientId] = useState("");
+  const [saved, setSaved] = useState("");
+
+  function handleListo() {
+    if (clientId.trim()) {
+      setSaved(clientId.trim());
+      setOpen(false);
+    }
+  }
+
+  return (
+    <div className="relative">
+      {/* Overlay para cerrar al hacer clic afuera */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="fixed inset-0 z-30"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Popup */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="absolute top-10 right-0 z-40 w-56 bg-white rounded-2xl p-4"
+            style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}
+            initial={{ opacity: 0, scale: 0.88, y: -6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.88, y: -6 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+          >
+            {/* Cerrar */}
+            <button
+              onClick={() => setOpen(false)}
+              className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+            >
+              <X size={12} className="text-gray-500" />
+            </button>
+
+            {/* Input */}
+            <input
+              autoFocus
+              type="text"
+              placeholder="Introduzca su ID"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleListo()}
+              className="w-full bg-gray-100 rounded-xl px-4 py-2.5 text-sm text-gray-700 outline-none placeholder:text-gray-400 mb-3 mt-1"
+            />
+
+            {/* Botón Listo */}
+            <button
+              onClick={handleListo}
+              className="w-full bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-sm font-bold rounded-xl py-2.5 transition-all"
+            >
+              Listo !
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Botón principal */}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-xs font-bold rounded-full px-4 py-1.5 transition-all whitespace-nowrap"
+        style={{ boxShadow: "0 2px 8px rgba(249,115,22,0.35)" }}
+      >
+        {saved ? `ID: ${saved}` : "ID del Cliente …"}
+      </button>
+    </div>
+  );
+}
+
 export default function App() {
   const [activeNav, setActiveNav] = useState(0);
   const [search, setSearch] = useState("");
@@ -242,12 +322,15 @@ export default function App() {
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-full px-3 py-1.5">
-            <ShoppingBag size={13} className="text-orange-500" />
-            <span className="text-xs font-semibold text-gray-700">Pedido</span>
-            <span className="text-xs text-gray-400">Editando</span>
-            <span className="text-xs font-bold text-gray-900">#2342484</span>
-            <ChevronRight size={12} className="text-orange-400" />
+          <div className="flex items-center gap-2">
+            <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-full px-3 py-1.5">
+              <ShoppingBag size={13} className="text-orange-500" />
+              <span className="text-xs font-semibold text-gray-700">Pedido</span>
+              <span className="text-xs text-gray-400">Editando</span>
+              <span className="text-xs font-bold text-gray-900">#2342484</span>
+              <ChevronRight size={12} className="text-orange-400" />
+            </div>
+            <ClientIdButton />
           </div>
         </div>
 
