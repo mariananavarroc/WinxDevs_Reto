@@ -4,6 +4,10 @@ from pydantic import BaseModel
 from typing import Optional
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
+import httpx
+import ssl
+import certifi
 import pandas as pd
 import os
 
@@ -12,7 +16,17 @@ import os
 # ==========================================
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+# Antivirus como Avast intercepta el tráfico HTTPS para escanearlo y reemplaza
+# los certificados por unos propios cuya cadena no pasa la validación estricta
+# (X509_STRICT) que exige OpenSSL 3 por defecto. Se desactiva esa bandera para
+# poder confiar en la cadena local sin deshabilitar la verificación TLS.
+_ssl_context = ssl.create_default_context(cafile=certifi.where())
+_ssl_context.verify_flags &= ~ssl.VERIFY_X509_STRICT
+
+client = genai.Client(
+    api_key=os.getenv("GEMINI_API_KEY"),
+    http_options=types.HttpOptions(httpx_client=httpx.Client(verify=_ssl_context)),
+)
 
 app = FastAPI(title="Tuali Growth Agent")
 
